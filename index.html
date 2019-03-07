@@ -1,72 +1,54 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
+  <head>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 2,
+          center: new google.maps.LatLng(2.8,-187.3),
+          mapTypeId: 'terrain'
+        });
 
-<head>
+        // Create a <script> tag and set the USGS URL as the source.
+        var script = document.createElement('script');
+        // This example uses a local copy of the GeoJSON stored at
+        // http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojsonp
+        script.src = 'https://developers.google.com/maps/documentation/javascript/examples/json/earthquake_GeoJSONP.js';
+        document.getElementsByTagName('head')[0].appendChild(script);
+      }
 
-  <meta charset="UTF-8">
-  <title>Click Button with Firebase!</title>
-
-  <!-- -->
-  <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
-
-</head>
-
-<body>
-
-  <!-- -->
-  <h1>Ouch! You've clicked me
-    <span id="click-value"></span> times!</h1>
-
-  <!-- -->
-  <button id="click-button">Click Me!!!!</button>
-
-  <!-- -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-  <!-- ================================================================================== -->
-  <script>
-
-    var config = {
-      apiKey: "AIzaSyAJS4YQWU5DmESeYueG1qH1NGkjv3DncEY",
-      authDomain: "fir-click-counter-7cdb9.firebaseapp.com",
-      databaseURL: "https://fir-click-counter-7cdb9.firebaseio.com",
-      storageBucket: "fir-click-counter-7cdb9.appspot.com"
-    };
-
-    firebase.initializeApp(config);
-
-    // VARIABLES
-    // --------------------------------------------------------------------------------
-
-    var database = firebase.database();
-    var clickCounter = 0;
-
-    // FUNCTIONS + EVENTS
-    // --------------------------------------------------------------------------------
-
-    $("#click-button").on("click", function() {
-      clickCounter++;
-
-      database.ref().set({
-        clickCount: clickCounter
-      });
-    });
-
-    // MAIN PROCESS + INITIAL CODE
-    // --------------------------------------------------------------------------------
-
-    database.ref().on("value", function(snapshot) {
-      console.log(snapshot.val());
-
-      clickCounter = snapshot.val().clickCount;
-
-      $("#click-value").text(snapshot.val().clickCount);
-    }, function(errorObject) {
-      console.log("The read failed: " + errorObject.code);
-    });
-
-  </script>
-
-</body>
-
+      // Loop through the results array and place a marker for each
+      // set of coordinates.
+      window.eqfeed_callback = function(results) {
+        for (var i = 0; i < results.features.length; i++) {
+          var coords = results.features[i].geometry.coordinates;
+          var latLng = new google.maps.LatLng(coords[1],coords[0]);
+          var marker = new google.maps.Marker({
+            position: latLng,
+            map: map
+          });
+        }
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfeF1mdQziELvIUJwPtaHf2ziQsnPHra4&callback=initMap">
+    </script>
+  </body>
 </html>
